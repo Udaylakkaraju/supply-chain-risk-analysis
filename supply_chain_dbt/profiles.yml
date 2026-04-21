@@ -1,0 +1,21 @@
+# BigQuery — local: set project / keyfile; or use dbt Cloud with service account JSON.
+# Local OAuth: gcloud auth application-default login
+# Then: dbt run --profiles-dir .
+
+supply_chain_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      # GCP project id
+      project: "supply-chain-analysis-492322"
+      dataset: supply_chain_analytics
+      location: US
+      threads: 4
+      priority: interactive
+      # Optional — service account (dbt Cloud often uses JSON inline instead):
+      # method: service-account
+      # keyfile: C:/path/to/service-account.json
+      # project: "your-project-id"
+      # dataset: supply_chain_analytics

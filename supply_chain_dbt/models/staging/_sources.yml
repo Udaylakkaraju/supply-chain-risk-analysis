@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: supply_chain
+    # database defaults to `target.project` (BigQuery GCP project id)
+    schema: supply_chain_raw
+    tables:
+      - name: orders
+        description: "DataCo export (snake_case columns) loaded from GCS into BigQuery."

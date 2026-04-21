@@ -1,0 +1,31 @@
+# Large data files — regenerate from source as needed
+raw/*.csv
+*.xlsx
+
+# Large mart export CSVs — regenerate with dbt run + export
+exports/fct_*.csv
+
+# BQML output CSVs are small and needed for the app to run — keep these committed
+# exports/bqml_*.csv  ← intentionally NOT ignored
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+*credentials*.json
+*-sa.json
+service-account*.json
+
+# dbt
+target/
+logs/
+dbt_packages/
+.user.yml
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
