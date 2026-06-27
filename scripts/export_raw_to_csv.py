@@ -1,6 +1,6 @@
 """
 Export Cleaned_DataCo_SupplyChain.xlsx to raw/cleaned_dataco_supplychain.csv
-with snake_case headers for BigQuery load / dbt. Run from repo root:
+with snake_case headers for loading into BigQuery. Run from repo root:
   python scripts/export_raw_to_csv.py
 """
 from __future__ import annotations

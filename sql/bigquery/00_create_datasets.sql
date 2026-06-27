@@ -1,9 +1,10 @@
--- Run in BigQuery (SQL workspace) for project `supply-chain-analysis-492322`.
+-- Create the BigQuery datasets used by the analyst SQL pipeline.
+-- Run in BigQuery SQL workspace for project `supply-chain-analysis-492322`.
 
--- Raw landing (GCS → BigQuery load target)
+-- Raw landing table lives here after the CSV upload.
 CREATE SCHEMA IF NOT EXISTS `supply-chain-analysis-492322.supply_chain_raw`
 OPTIONS (location = 'US');
 
--- dbt outputs (staging / intermediate / marts views & tables)
+-- Clean staging table and final Power BI marts live here.
 CREATE SCHEMA IF NOT EXISTS `supply-chain-analysis-492322.supply_chain_analytics`
 OPTIONS (location = 'US');
