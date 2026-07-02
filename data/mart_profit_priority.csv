@@ -1,0 +1,5 @@
+profit_quartile,profit_tier,orders,sla_breached_orders,sla_breach_rate_pct,avg_days_late,total_profit_usd,profit_at_risk_usd
+1,Highest profit,16438,9339,56.81,0.55,4086710.97,2314448.35
+2,Upper-middle profit,16438,9495,57.76,0.58,1849628.2,1069576.86
+3,Lower-middle profit,16438,9388,57.11,0.55,636187.47,363901.77
+4,Lowest profit,16438,9476,57.65,0.58,-2605623.67,5401.44

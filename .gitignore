@@ -1,6 +1,6 @@
 # Large source files (regenerate from source)
 raw/*.csv
-*.xlsx
+Cleaned_DataCo_SupplyChain.xlsx
 
 # Internal working files - not for public repo
 AGENTS.md
@@ -13,8 +13,18 @@ __pycache__/
 .venv/
 venv/
 .env
+node_modules/
 
 # BigQuery credentials - never commit
 *credentials*.json
 *-sa.json
-service-account*
+service-account*.json
+
+# Legacy exports
+exports/fct_*.csv
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

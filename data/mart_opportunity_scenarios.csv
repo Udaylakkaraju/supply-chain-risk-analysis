@@ -1,0 +1,4 @@
+scenario,orders_in_scope,modeled_breaches_addressed,modeled_profit_exposure_usd,supporting_metric,supporting_metric_label,supporting_metric_value,caveat
+Scenario 1: One-Day Second Class Recovery,12778,2531,253000.87,2531.0,Delivery days recovered,2531,Modeled: reduce actual Second Class delivery time by 1 day. Requires operational pilot validation -- not a realized saving.
+Scenario 2: High-Value Routing Guardrail,3159,1256,626948.33,2516.0,Current breached orders in scope,2516,Modeled routing scenario: assumes Q1 Second Class orders would match Standard Class breach rate if rerouted. Not proven savings -- requires pilot validation.
+Scenario 3: Top-Five Operational-Lane Stabilization,30150,3097,308970.75,,Relative breach reduction (%),20,Modeled: 20% relative breach reduction across the 5 lanes ranked highest by variability_priority_rank. Requires pilot validation -- not a realized saving.

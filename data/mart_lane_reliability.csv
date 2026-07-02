@@ -1,0 +1,20 @@
+market,shipping_mode,operational_lane,orders,sla_breached_orders,sla_breach_rate_pct,share_of_all_lane_breaches_pct,avg_days_late,delivery_variability_days,profit_at_risk_usd,profit_risk_rank,variability_priority_rank,recommended_action
+Europe,Standard Class,Europe | Standard Class,11075,4417,39.88,11.75,-0.01,1.42,465247.74,1,1,Stabilize
+Europe,Second Class,Europe | Second Class,3609,2886,79.97,7.68,2.01,1.42,303644.63,5,2,Protect
+LATAM,Second Class,LATAM | Second Class,3307,2624,79.35,6.98,1.99,1.42,277052.94,7,3,Protect
+Pacific Asia,Standard Class,Pacific Asia | Standard Class,10481,4219,40.25,11.23,0.01,1.42,354965.89,3,4,Stabilize
+USCA,Second Class,USCA | Second Class,1678,1341,79.92,3.57,1.99,1.42,143942.57,11,5,Stabilize
+LATAM,Standard Class,LATAM | Standard Class,10323,4072,39.45,10.83,-0.01,1.41,427166.73,2,6,Stabilize
+Africa,Second Class,Africa | Second Class,715,573,80.14,1.52,1.98,1.41,56477.4,15,7,Stabilize
+USCA,Standard Class,USCA | Standard Class,5097,2032,39.87,5.41,0.0,1.41,208452.86,10,8,Monitor
+Africa,Standard Class,Africa | Standard Class,2348,939,39.99,2.5,0.01,1.41,98827.77,13,9,Maintain
+Pacific Asia,Second Class,Pacific Asia | Second Class,3469,2789,80.4,7.42,2.01,1.4,233471.68,8,10,Protect
+LATAM,Same Day,LATAM | Same Day,913,470,51.48,1.25,0.51,0.5,42977.9,17,11,Monitor
+Europe,Same Day,Europe | Same Day,999,480,48.05,1.28,0.48,0.5,47960.83,16,12,Monitor
+Pacific Asia,Same Day,Pacific Asia | Same Day,959,456,47.55,1.21,0.48,0.5,34767.35,18,13,Maintain
+USCA,Same Day,USCA | Same Day,466,208,44.64,0.55,0.45,0.5,20338.55,19,14,Maintain
+Europe,First Class,Europe | First Class,2878,2878,100.0,7.66,1.0,0.0,309902.77,4,15,Review SLA Definition
+Pacific Asia,First Class,Pacific Asia | First Class,2668,2668,100.0,7.1,1.0,0.0,233132.37,9,16,Review SLA Definition
+LATAM,First Class,LATAM | First Class,2638,2638,100.0,7.02,1.0,0.0,284501.2,6,17,Review SLA Definition
+USCA,First Class,USCA | First Class,1338,1338,100.0,3.56,1.0,0.0,139139.09,12,18,Review SLA Definition
+Africa,First Class,Africa | First Class,557,557,100.0,1.48,1.0,0.0,60050.09,14,19,Review SLA Definition

@@ -1,0 +1,5 @@
+shipping_mode,orders,sla_breached_orders,sla_breach_rate_pct,avg_promised_delivery_days,avg_actual_delivery_days,median_actual_delivery_days,p90_actual_delivery_days,avg_promise_gap_days,suggested_sla_days,profit_at_risk_usd,root_cause_summary
+First Class,10079,10079,100.0,1.0,2.0,2.0,2.0,1.0,2,1026725.52,Promise miscalibration - SLA commitment is systematically too aggressive
+Second Class,12778,10213,79.93,2.0,4.0,4.0,6.0,2.0,6,1014589.22,Promise miscalibration - SLA commitment is systematically too aggressive
+Same Day,3571,1727,48.36,0.0,0.48,0.0,1.0,0.48,1,157352.69,Operational variability - delivery times vary widely around the promise
+Standard Class,39324,15679,39.87,4.0,4.0,4.0,6.0,0.0,6,1554660.99,Acceptable performance

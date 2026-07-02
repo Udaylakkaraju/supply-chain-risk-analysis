@@ -1,0 +1,5 @@
+shipping_mode,orders,sla_breached_orders,sla_breach_rate_pct,avg_promised_delivery_days,avg_actual_delivery_days,avg_days_late,profit_at_risk_usd,service_risk_level,business_note
+First Class,10079,10079,100.0,1.0,2.0,1.0,1026725.52,High risk,Structural SLA artifact - disclose separately; do not treat as operational variability
+Second Class,12778,10213,79.93,2.0,4.0,2.0,1014589.22,High risk,Primary service-promise concern
+Same Day,3571,1727,48.36,0.0,0.48,0.48,157352.69,Stable,Operational comparison
+Standard Class,39324,15679,39.87,4.0,4.0,0.0,1554660.99,Stable,Operational comparison
