@@ -118,4 +118,46 @@ A compact workbook built from the corrected mart exports (not a duplicate of the
 
 ## BigQuery Data Model
 
-Project: `supply-chain-analysis-492322` · Dataset: `supply_chain
+Project: `supply-chain-analysis-492322` · Dataset: `supply_chain_analytics`
+
+| Table | Grain | Purpose |
+|---|---|---|
+| `stg_orders` | Order item | Typed, cleaned source data |
+| `int_orders` | Order | One row per order, additive profit/revenue |
+| `mart_executive_kpis` | One row | Executive KPI cards |
+| `mart_profit_priority` | Profit quartile | Value-protection analysis by profit tier |
+| `mart_shipping_mode_performance` | Shipping mode | SLA and profit exposure by mode |
+| `mart_lane_reliability` | Market-mode segment | Reliability ranking + recommended action |
+| `mart_market_efficiency` | Market | Volume, profit, margin, efficiency |
+| `mart_sla_promise_gap` | Shipping mode | Scheduled vs. actual delivery |
+| `mart_monthly_trends` | Month | Breach-rate and exposure trend over time |
+| `mart_customer_segments` | Customer segment | Commercial drill-down |
+| `mart_opportunity_scenarios` | Scenario | The three quantified opportunities above |
+
+**SQL techniques used** (kept concise and interview-explainable): `SAFE_CAST` + `CASE` + null guards for staging; `COUNTIF` and `SAFE_DIVIDE` for safe rate calculations; CTEs for readable multi-step transforms; `NTILE` for profit quartiles; `ROW_NUMBER` with deterministic tie-breakers for lane ranking; `SUM() OVER` for contribution shares; `STDDEV_POP` for delivery variability; `LAG` for month-over-month movement.
+
+The order model uses `SUM(order_profit_per_order)` rather than `MAX()`, because profit values vary across the item rows within an order — `MAX()` would distort both total profit and value-tier exposure.
+
+### Rebuild from scratch
+
+```bash
+bq query --use_legacy_sql=false < sql/bigquery/00_create_datasets.sql
+bq query --use_legacy_sql=false < sql/bigquery/01_build_stg_orders.sql
+bq query --use_legacy_sql=false < sql/bigquery/01c_build_int_orders.sql
+bq query --use_legacy_sql=false < sql/bigquery/02_build_powerbi_marts.sql
+bq query --use_legacy_sql=false < sql/bigquery/02b_build_mart_customer_segments.sql
+bq query --use_legacy_sql=false < sql/bigquery/02c_build_mart_opportunity_scenarios.sql
+bq query --use_legacy_sql=false < sql/bigquery/03_validate_outputs.sql
+```
+
+Run after loading the source CSV into `supply_chain_raw.orders`. `00b_prepare_table_rebuild.sql` is only needed if a legacy view conflicts with a table name. `sql/bigquery/maintenance/` holds one-off scripts (legacy-object cleanup, freshness checks, quick validation) that aren't part of the main rebuild sequence.
+
+---
+
+## Limitations
+
+- Scenario results are estimates, not realized savings — every one is labeled as requiring pilot validation.
+- First Class has a structural fixed-delay pattern in this dataset and is disclosed separately rather than folded into "normal" variability.
+- Operational lanes are `market × shipping_mode` segments, not physical carrier routes — the dataset has no carrier-level routing data.
+- The dataset doesn't include intervention costs, carrier contracts, or actual post-pilot outcomes, so financial exposure numbers are upper bounds on opportunity, not guaranteed savings.
+- This analysis uses the public DataCo Supply Chain dataset (Kaggle) framed as a retailer's operational data — it's a self-directed analytics project, not a live deployment against a company's production data.

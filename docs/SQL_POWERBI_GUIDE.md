@@ -133,4 +133,8 @@ Do not delete BigQuery objects blindly. Use:
 
 `sql/bigquery/maintenance/99_review_cleanup_old_objects.sql`
 
-That script lists current tables first and keeps all `DROP` statements comm
+That script lists current tables first and keeps all `DROP` statements commented out until you manually confirm what is safe to remove. `sql/bigquery/maintenance/` also holds `check_table_freshness.sql` and `quick_validation_query.sql` — one-off scripts kept out of the main numbered rebuild sequence.
+
+## Optional Python
+
+Python is not part of the main analytics story. Keep it limited to small helper tasks such as converting the original Excel file to CSV before loading into BigQuery.
