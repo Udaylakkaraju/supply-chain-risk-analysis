@@ -9,7 +9,11 @@
 
 Over half of all orders in this network miss their delivery promise. That failure isn't evenly distributed — it's concentrated in specific shipping modes and lanes, and it hits high-profit orders exactly as often as low-profit ones. This project traces $33M in order revenue through a BigQuery data model to find where the failures are, how much profit sits behind them, and which fixes would recover the most value first.
 
+*Dataset: public [DataCo Smart Supply Chain](https://data.mendeley.com/datasets/8gx2fvg2k6/5) (also on Kaggle), framed as a retailer's operational data. Portfolio project — not a live company deployment.*
+
 ![Key metrics](outputs/kpi_hero_banner.png)
+
+**In short:** 57.3% of orders breach SLA · $3.75M profit sits on those breaches · five lanes hold 41% of the damage · three modeled pilots size the recovery path (not claimed savings).
 
 ---
 
@@ -41,6 +45,12 @@ Three questions drive the analysis:
 
 ![Breach rate has stayed structurally high](outputs/monthly_trend.png)
 
+Full query-by-query walkthroughs (SQL, result, business read):
+
+1. [Value-blind fulfillment](analysis/01_chapter_fulfillment_prioritization.md) — profit quartiles vs breach rate
+2. [Market efficiency](analysis/02_chapter_market_misallocation.md) — where volume and profit diverge
+3. [Service recovery & lane priority](analysis/03_chapter_variability.md) — shipping modes, lanes, and where to intervene
+
 ## Recommendations
 
 These are modeled scenarios sized from the data, not realized savings — each one is scoped to a specific, testable pilot rather than a network-wide rollout.
@@ -66,9 +76,27 @@ flowchart LR
 
 The source data is one row per *order item* — a single order can span several rows, and profit/revenue repeat across those rows. Summing naively overstates both. SQL in BigQuery collapses the data to one row per order (`SUM()`, not `MAX()`), then builds purpose-specific summary tables: one for executive KPIs, one for profit-tier analysis, one for lane reliability, and so on. Power BI, Excel, and this README all read from the same tables, so the numbers always agree.
 
+**Methods that mattered**
+
+- **Grain correction** — collapse item-level rows to one row per order before any profit or revenue rollup, so totals aren't double-counted
+- **Promise vs delivery** — measure each shipping mode on scheduled days vs actual days, not breach rate alone
+- **Structural vs operational failure** — treat First Class's impossible 1-day promise as a definition issue, separate from Second Class variability
+- **Reconciled outputs** — `scripts/validate_exports.py` checks order counts, breaches, profit, exposure, and scenario caveats before charts or BI refresh
+
 A companion Excel workbook adds a PivotTable with slicers, a carrier-delay sensitivity model, and a value-only exception export for teams that work outside BigQuery/Power BI:
 
 ![Excel pivot analysis with market/shipping-mode slicers](outputs/supply_chain_excel_toolkit/Pivot_Analysis_preview.png)
+
+## Explore without BigQuery
+
+You don't need a GCP project to review the work:
+
+| Open this | To do this |
+|---|---|
+| `Supply_Chain_Operational_Analysis.xlsx` | Read the management workbook (summary, lanes, scenarios, data dictionary) |
+| `supply chain.pbix` | Open the 3-page Power BI report |
+| `data/*.csv` | Inspect the same marts the charts and BI layer use |
+| `analysis/` | Follow each finding from SQL → result → business read |
 
 ## What's in this repo
 
@@ -78,7 +106,7 @@ A companion Excel workbook adds a PivotTable with slicers, a carrier-delay sensi
 | `supply chain.pbix` | The Power BI report (3 pages) |
 | `sql/bigquery/` | Full transformation and validation SQL, numbered in run order |
 | `data/` | Refreshed mart exports (CSV), one file per business question |
-| `analysis/` | Query-by-query log: exact SQL, result, and business read for every material finding |
+| `analysis/` | [Chapter write-ups](analysis/01_chapter_fulfillment_prioritization.md) with exact SQL, results, and business reads |
 | `outputs/` | Chart images used in this README |
 | `scripts/generate_visuals.py` | Regenerates every chart in this README from the mart CSVs |
 | `scripts/validate_exports.py` | Reconciliation check for the checked-in mart exports |
@@ -113,6 +141,5 @@ Run after loading the source CSV into `supply_chain_raw.orders`. The Python vali
 - "Operational lanes" are `market x shipping_mode` segments, not physical carrier routes — the dataset has no carrier-level routing data.
 - The lane-priority ranking scopes to segments with at least 350 orders; lower-volume segments stay in the order model and shipping-mode totals but are excluded from lane ranking.
 - The dataset doesn't include intervention costs, carrier contracts, or actual post-pilot outcomes, so financial exposure figures are upper bounds on opportunity, not guaranteed savings.
-- This project uses the public DataCo Supply Chain dataset (Kaggle), framed as a retailer's operational data. It's a self-directed analytics project, not a live deployment against a company's production data.
 
 </details>
