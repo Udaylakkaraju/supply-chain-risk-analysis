@@ -9,7 +9,7 @@
 
 Over half of all orders in this network miss their delivery promise. That failure isn't evenly distributed — it's concentrated in specific shipping modes and lanes, and it hits high-profit orders exactly as often as low-profit ones. This project traces $33M in order revenue through a BigQuery data model to find where the failures are, how much profit sits behind them, and which fixes would recover the most value first.
 
-*Dataset: public [DataCo Smart Supply Chain](https://data.mendeley.com/datasets/8gx2fvg2k6/5) (also on Kaggle), framed as a retailer's operational data. Portfolio project — not a live company deployment.*
+*Dataset: public [DataCo Smart Supply Chain](https://data.mendeley.com/datasets/8gx2fvg2k6/5) (also on Kaggle), framed as a retailer's operational data.*
 
 ![Key metrics](outputs/kpi_hero_banner.png)
 
@@ -61,8 +61,6 @@ These are modeled scenarios sized from the data, not realized savings — each o
 | 2 | Route top-profit-quartile Second Class orders onto a more reliable service tier | 3,159 orders | 1,256 avoidable breaches against a $627K exposure pool |
 | 3 | Apply a 20% reliability improvement to the five highest-variability lanes | 30,150 orders | 3,097 fewer breaches, ~$309K profit protected |
 
-Recommendation 1 is the narrowest, fastest pilot: one shipping mode, no routing changes. Recommendation 3 has the largest order volume in scope and directly targets the 41% breach concentration. Recommendation 2 carries the highest dollar exposure per order and is the most direct test of the value-blind finding above.
-
 ## How it was built
 
 ```mermaid
@@ -76,27 +74,9 @@ flowchart LR
 
 The source data is one row per *order item* — a single order can span several rows, and profit/revenue repeat across those rows. Summing naively overstates both. SQL in BigQuery collapses the data to one row per order (`SUM()`, not `MAX()`), then builds purpose-specific summary tables: one for executive KPIs, one for profit-tier analysis, one for lane reliability, and so on. Power BI, Excel, and this README all read from the same tables, so the numbers always agree.
 
-**Methods that mattered**
-
-- **Grain correction** — collapse item-level rows to one row per order before any profit or revenue rollup, so totals aren't double-counted
-- **Promise vs delivery** — measure each shipping mode on scheduled days vs actual days, not breach rate alone
-- **Structural vs operational failure** — treat First Class's impossible 1-day promise as a definition issue, separate from Second Class variability
-- **Reconciled outputs** — `scripts/validate_exports.py` checks order counts, breaches, profit, exposure, and scenario caveats before charts or BI refresh
-
-A companion Excel workbook adds a PivotTable with slicers, a carrier-delay sensitivity model, and a value-only exception export for teams that work outside BigQuery/Power BI:
+To review without BigQuery, open `Supply_Chain_Operational_Analysis.xlsx`, `supply chain.pbix`, or the mart CSVs in `data/`.
 
 ![Excel pivot analysis with market/shipping-mode slicers](outputs/supply_chain_excel_toolkit/Pivot_Analysis_preview.png)
-
-## Explore without BigQuery
-
-You don't need a GCP project to review the work:
-
-| Open this | To do this |
-|---|---|
-| `Supply_Chain_Operational_Analysis.xlsx` | Read the management workbook (summary, lanes, scenarios, data dictionary) |
-| `supply chain.pbix` | Open the 3-page Power BI report |
-| `data/*.csv` | Inspect the same marts the charts and BI layer use |
-| `analysis/` | Follow each finding from SQL → result → business read |
 
 ## What's in this repo
 
