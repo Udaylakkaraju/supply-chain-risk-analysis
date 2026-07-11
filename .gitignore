@@ -23,8 +23,15 @@ service-account*.json
 # Legacy exports
 exports/fct_*.csv
 
+# Agent tool working folders - not part of the deliverable
+.claude/
+.codex-work/
+
 # OS / IDE
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
+
+# Debug dumps
+*.inspect.ndjson

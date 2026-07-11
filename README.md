@@ -1,144 +1,93 @@
-# Supply Chain SLA Risk & Profit Protection Analytics
+# Supply Chain Profit-at-Risk Analytics
 
 ![BigQuery](https://img.shields.io/badge/SQL-BigQuery-4285F4?style=flat&logo=googlecloud&logoColor=white)
 ![Power BI](https://img.shields.io/badge/Power_BI-F2C811?style=flat&logo=powerbi&logoColor=black)
 ![Excel](https://img.shields.io/badge/Excel-217346?style=flat&logo=microsoftexcel&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
 
-**A 65,752-order supply chain analysis that finds where SLA failures are hurting profit most, and where to intervene first.**
+**Which orders, shipping modes, and lanes should a fulfillment team fix first to protect the most profit?**
 
-Built end-to-end: raw data → BigQuery SQL data model → Power BI report → Excel workbook.
+Over half of all orders in this network miss their delivery promise. That failure isn't evenly distributed — it's concentrated in specific shipping modes and lanes, and it hits high-profit orders exactly as often as low-profit ones. This project traces $33M in order revenue through a BigQuery data model to find where the failures are, how much profit sits behind them, and which fixes would recover the most value first.
 
----
-
-## 30-Second Summary
-
-Over half of all orders in this dataset miss their delivery promise. That's expensive — but not evenly expensive. This project answers one question:
-
-> **Which orders, shipping modes, markets, and lanes should get fixed first to cut SLA failures and protect profit?**
-
-The headline finding: **the network treats every order the same, regardless of how much profit is riding on it.** High-value orders get delivered just as unreliably as low-value ones. That's a fixable, prioritizable problem — and this project quantifies exactly where to start.
-
-| Metric | Result |
-|---|---:|
-| Orders analyzed | 65,752 |
-| SLA-breached orders | 37,698 (**57.3%**) |
-| Total profit | $3.97M |
-| Profit sitting on breached orders | $3.75M |
-| Profit at risk in high-value breached orders | $2.31M |
-| Breach share held by the worst 5 lanes | 41.2% |
-| Second Class breach rate | 79.9% |
+![Key metrics](outputs/kpi_hero_banner.png)
 
 ---
 
-## The Story, in Three Findings
+## The problem
 
-**1. The network is value-blind.** Orders were split into profit quartiles — the top 25% most profitable orders vs. the bottom 25%. If fulfillment were value-aware, the top quartile should see noticeably fewer breaches. It doesn't: breach rates sit within **1 percentage point of each other across every quartile** (56.8%–57.8%). $2.31M in profit from high-value orders is exposed to breaches that better routing could have avoided.
+A retailer's fulfillment network is supposed to protect its most valuable orders first — in practice, this one doesn't. Every order, regardless of how much profit is riding on it, gets roughly the same one-in-two chance of arriving late. That's not just an operations issue; it's $3.75M in profit sitting on breached orders, $2.31M of it on the network's own highest-profit tier.
+
+Three questions drive the analysis:
+
+1. Does fulfillment protect high-profit orders more than low-profit ones? (No.)
+2. Which shipping modes are breaking their own delivery promise, and by how much?
+3. Where should a recovery effort start, given limited operational bandwidth?
+
+## Key findings
+
+**1. High-profit orders get no fulfillment advantage.** Orders were split into profit quartiles. If the network favored its best orders, the top quartile should breach noticeably less often. It doesn't — every quartile breaches within one point of the 57.3% average, including the top tier carrying $4.09M in profit.
 
 ![High-profit orders get no fulfillment advantage](outputs/profit_quartile_breach.png)
 
-**2. Second Class is the clearest fixable failure.** Every shipping mode was compared on what it *promises* vs. what it *actually delivers*. First Class technically shows a 100% breach rate, but that's a structural artifact of how its SLA is defined in the data (flagged separately, not treated as a real operational problem). Second Class is the real story: it promises 2 days, actually takes 4, and breaches **79.9%** of the time — while carrying real profit exposure ($1.01M).
+**2. Second Class is the clearest, most fixable failure.** Every shipping mode was measured on what it promises against what it actually delivers. Second Class promises 2 days, takes 4, and breaches 79.9% of the time, carrying $1.01M in exposed profit. (First Class shows a 100% breach rate too, but that's a structural artifact of a 1-day promise the network can never technically meet — it's flagged separately, not counted as an operational failure.)
 
 ![Second Class carries the clearest service-promise gap](outputs/shipping_mode_sla_gap.png)
 
-**3. A small number of lanes cause most of the damage.** Every `market × shipping mode` combination ("operational lane") was ranked by breach rate, profit at risk, and delivery-time variability, then sorted into an action category: Protect, Stabilize, Monitor, Maintain, or Review SLA Definition. The **top 5 least stable lanes account for 41.2% of all grouped SLA breaches** — a small, addressable target instead of a vague "fix everything" mandate.
+**3. Five lanes carry almost half the damage.** Every market x shipping-mode combination was ranked by breach rate, profit at risk, and delivery variability, then assigned an action: Protect, Stabilize, Monitor, Maintain, or Review SLA Definition. Five lanes — out of nineteen — account for 41% of all breaches network-wide.
 
-![Operational lane priority scatter](outputs/lane_priority_scatter.png)
+![A small set of lanes carries most of the risk](outputs/lane_priority_scatter.png)
 
-**Bonus check — is this a recent problem or a long-standing one?** The breach rate has held steady in the 55–65% range for three straight years — this isn't a one-off bad quarter, it's a structural pattern.
+**Is this new, or structural?** The breach rate has sat in the 55–65% band every month for three straight years. This isn't a bad quarter — it's how the network normally runs.
 
-![Monthly breach rate and profit-at-risk trend](outputs/monthly_trend.png)
+![Breach rate has stayed structurally high](outputs/monthly_trend.png)
 
----
+## Recommendations
 
-## Quantified Opportunities
+These are modeled scenarios sized from the data, not realized savings — each one is scoped to a specific, testable pilot rather than a network-wide rollout.
 
-These are **modeled scenarios that require pilot validation** — not realized savings. They're presented that way on purpose: overclaiming certainty on a public dataset is a bigger credibility risk than being precise about what's proven vs. estimated.
+| Priority | Recommendation | Scope | Modeled outcome |
+|---|---|---|---|
+| 1 | Cut Second Class delivery time by one day | 12,778 Second Class orders | 2,531 fewer breaches, ~$253K profit protected |
+| 2 | Route top-profit-quartile Second Class orders onto a more reliable service tier | 3,159 orders | 1,256 avoidable breaches against a $627K exposure pool |
+| 3 | Apply a 20% reliability improvement to the five highest-variability lanes | 30,150 orders | 3,097 fewer breaches, ~$309K profit protected |
 
-| Scenario | Population | Modeled operational impact | Financial exposure |
-|---|---:|---:|---:|
-| One-day Second Class recovery | 12,778 orders | 2,531 breaches addressed, 2,531 delivery-days recovered | $253K addressed |
-| High-value routing guardrail | 3,159 Q1 Second Class orders | 1,256 modeled avoidable breaches | $627K current exposure pool |
-| Top-five lane stabilization | 30,150 orders | 3,097 breaches addressed at a 20% relative improvement | $309K addressed |
+Recommendation 1 is the narrowest, fastest pilot: one shipping mode, no routing changes. Recommendation 3 has the largest order volume in scope and directly targets the 41% breach concentration. Recommendation 2 carries the highest dollar exposure per order and is the most direct test of the value-blind finding above.
 
-*An "operational lane" means a `market × shipping_mode` segment — the dataset doesn't include carrier-level physical routes.*
+## How it was built
 
----
-
-## How It Was Built
-
-```text
-Excel source / CSV
-        |
-        v
-BigQuery raw table (order-item grain)
-        |
-        v
-stg_orders  ->  int_orders (one row per order)
-        |
-        v
-Power BI marts + opportunity scenarios
-        |                     |
-        v                     v
-Excel analysis workbook    Power BI report
+```mermaid
+flowchart LR
+    A["Raw order-item data\n(180K rows, CSV)"] --> B["BigQuery: stg_orders\ncleaned & typed"]
+    B --> C["BigQuery: int_orders\none row per order"]
+    C --> D["Marts\nKPIs, profit tiers, lanes,\nmarkets, scenarios"]
+    D --> E["Power BI\n3-page report"]
+    D --> F["Excel workbook\n+ pivot toolkit"]
 ```
 
-In plain terms: the raw data is one row per *order item* (multiple rows can belong to one order). SQL in BigQuery cleans and types the raw data (`stg_orders`), collapses it to one row per *order* (`int_orders`), then aggregates it into purpose-built summary tables ("marts") — one for executive KPIs, one for profit-tier analysis, one for lane reliability, and so on. Power BI and Excel both read from these same marts, so the numbers in the report, the workbook, and this README always agree.
+The source data is one row per *order item* — a single order can span several rows, and profit/revenue repeat across those rows. Summing naively overstates both. SQL in BigQuery collapses the data to one row per order (`SUM()`, not `MAX()`), then builds purpose-specific summary tables: one for executive KPIs, one for profit-tier analysis, one for lane reliability, and so on. Power BI, Excel, and this README all read from the same tables, so the numbers always agree.
 
-**Why BigQuery + SQL instead of just Excel or Python?** The 180,519-row source is order-*item* grain, and profit/revenue values repeat across item rows within the same order — summing naively would overstate both. Getting the order-grain math right (using `SUM()` correctly instead of `MAX()`, using `NTILE()` for quartiles, `ROW_NUMBER()` for tie-broken lane rankings) is exactly the kind of correctness problem SQL is built to solve reliably and repeatably.
+A companion Excel workbook adds a PivotTable with slicers, a carrier-delay sensitivity model, and a value-only exception export for teams that work outside BigQuery/Power BI:
 
----
+![Excel pivot analysis with market/shipping-mode slicers](outputs/supply_chain_excel_toolkit/Pivot_Analysis_preview.png)
 
-## What's in This Repo
+## What's in this repo
 
-| Deliverable | What it's for |
+| Path | Contents |
 |---|---|
-| `Supply_Chain_Operational_Analysis.xlsx` | Management-ready Excel workbook (Executive Summary, Profit Priority, Lanes, Market, Customer Segments, Opportunity Scenarios, Data Dictionary) |
-| `supply chain.pbix` | The active Power BI report (3 pages, described below) |
-| `sql/bigquery/` | Full transformation, analysis, and validation SQL, numbered in run order |
-| `data/` | Refreshed mart exports (CSV) — one clean file per business question |
-| `analysis/` | Query-by-query analytical log: exact SQL, result, and business interpretation for every material finding |
+| `Supply_Chain_Operational_Analysis.xlsx` | Management-ready workbook — Executive Summary, Profit Priority, Lanes, Markets, Customer Segments, Opportunity Scenarios, Data Dictionary |
+| `supply chain.pbix` | The Power BI report (3 pages) |
+| `sql/bigquery/` | Full transformation and validation SQL, numbered in run order |
+| `data/` | Refreshed mart exports (CSV), one file per business question |
+| `analysis/` | Query-by-query log: exact SQL, result, and business read for every material finding |
 | `outputs/` | Chart images used in this README |
+| `scripts/generate_visuals.py` | Regenerates every chart in this README from the mart CSVs |
+| `scripts/validate_exports.py` | Reconciliation check for the checked-in mart exports |
 | `docs/` | Power BI DAX measures and the SQL → Power BI build guide |
 
-## Power BI Report
-
-Three pages, in a deliberate narrative order:
-
-1. **Executive Summary & Profit Protection** — top-line KPIs and the value-blind thesis
-2. **Service, Market & Customer Performance** — shipping mode SLA gaps and market/customer context
-3. **Operational-Lane Priority & Recommendations** — the lane scatter and action-category recommendations
-
-The signature visual is the lane-priority scatter (shown above): profit exposure × breach rate × order volume × recommended action, all in one view. Any "top 5 unstable" calculation uses `variability_priority_rank`, never `profit_risk_rank` — they answer different questions and aren't interchangeable.
-
-## Excel Workbook
-
-A compact workbook built from the corrected mart exports (not a duplicate of the 89MB raw source): Executive Summary, Data Quality & Reconciliation, Profit Priority, Shipping Modes, Operational Lanes, Market Analysis, Customer Segments, Opportunity Scenarios, Monthly Trends, SLA Promise Gap, and a Data Dictionary.
-
----
-
-## BigQuery Data Model
+<details>
+<summary><strong>Rebuild from scratch</strong></summary>
 
 Project: `supply-chain-analysis-492322` · Dataset: `supply_chain_analytics`
-
-| Table | Grain | Purpose |
-|---|---|---|
-| `stg_orders` | Order item | Typed, cleaned source data |
-| `int_orders` | Order | One row per order, additive profit/revenue |
-| `mart_executive_kpis` | One row | Executive KPI cards |
-| `mart_profit_priority` | Profit quartile | Value-protection analysis by profit tier |
-| `mart_shipping_mode_performance` | Shipping mode | SLA and profit exposure by mode |
-| `mart_lane_reliability` | Market-mode segment | Reliability ranking + recommended action |
-| `mart_market_efficiency` | Market | Volume, profit, margin, efficiency |
-| `mart_sla_promise_gap` | Shipping mode | Scheduled vs. actual delivery |
-| `mart_monthly_trends` | Month | Breach-rate and exposure trend over time |
-| `mart_customer_segments` | Customer segment | Commercial drill-down |
-| `mart_opportunity_scenarios` | Scenario | The three quantified opportunities above |
-
-**SQL techniques used** (kept concise and interview-explainable): `SAFE_CAST` + `CASE` + null guards for staging; `COUNTIF` and `SAFE_DIVIDE` for safe rate calculations; CTEs for readable multi-step transforms; `NTILE` for profit quartiles; `ROW_NUMBER` with deterministic tie-breakers for lane ranking; `SUM() OVER` for contribution shares; `STDDEV_POP` for delivery variability; `LAG` for month-over-month movement.
-
-The order model uses `SUM(order_profit_per_order)` rather than `MAX()`, because profit values vary across the item rows within an order — `MAX()` would distort both total profit and value-tier exposure.
-
-### Rebuild from scratch
 
 ```bash
 bq query --use_legacy_sql=false < sql/bigquery/00_create_datasets.sql
@@ -148,16 +97,23 @@ bq query --use_legacy_sql=false < sql/bigquery/02_build_powerbi_marts.sql
 bq query --use_legacy_sql=false < sql/bigquery/02b_build_mart_customer_segments.sql
 bq query --use_legacy_sql=false < sql/bigquery/02c_build_mart_opportunity_scenarios.sql
 bq query --use_legacy_sql=false < sql/bigquery/03_validate_outputs.sql
+python scripts/validate_exports.py
+python scripts/generate_visuals.py
 ```
 
-Run after loading the source CSV into `supply_chain_raw.orders`. `00b_prepare_table_rebuild.sql` is only needed if a legacy view conflicts with a table name. `sql/bigquery/maintenance/` holds one-off scripts (legacy-object cleanup, freshness checks, quick validation) that aren't part of the main rebuild sequence.
+Run after loading the source CSV into `supply_chain_raw.orders`. The Python validator reconciles order counts, breach counts, profit, exposure, lane scope, and scenario caveats before anything downstream refreshes. `00b_prepare_table_rebuild.sql` is only needed if a legacy view conflicts with a table name; `sql/bigquery/maintenance/` holds one-off scripts not part of the main sequence.
 
----
+</details>
 
-## Limitations
+<details>
+<summary><strong>Scope and limitations</strong></summary>
 
-- Scenario results are estimates, not realized savings — every one is labeled as requiring pilot validation.
-- First Class has a structural fixed-delay pattern in this dataset and is disclosed separately rather than folded into "normal" variability.
-- Operational lanes are `market × shipping_mode` segments, not physical carrier routes — the dataset has no carrier-level routing data.
-- The dataset doesn't include intervention costs, carrier contracts, or actual post-pilot outcomes, so financial exposure numbers are upper bounds on opportunity, not guaranteed savings.
-- This analysis uses the public DataCo Supply Chain dataset (Kaggle) framed as a retailer's operational data — it's a self-directed analytics project, not a live deployment against a company's production data.
+- All scenario results are modeled estimates sized from the data, not realized savings — each requires pilot validation before being treated as a savings commitment.
+- First Class has a structural fixed-delay pattern (a 1-day promise the network can't technically meet) and is disclosed separately rather than folded into normal variability.
+- "Operational lanes" are `market x shipping_mode` segments, not physical carrier routes — the dataset has no carrier-level routing data.
+- The lane-priority ranking scopes to segments with at least 350 orders; lower-volume segments stay in the order model and shipping-mode totals but are excluded from lane ranking.
+- The dataset doesn't include intervention costs, carrier contracts, or actual post-pilot outcomes, so financial exposure figures are upper bounds on opportunity, not guaranteed savings.
+- This project uses the public DataCo Supply Chain dataset (Kaggle), framed as a retailer's operational data. It's a self-directed analytics project, not a live deployment against a company's production data.
+
+</details>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                

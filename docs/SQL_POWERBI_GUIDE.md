@@ -2,11 +2,11 @@
 
 ## Project Positioning
 
-**Supply Chain SLA Risk & Profit Protection Analytics** is an analyst-friendly portfolio project built around SQL, BigQuery, Power BI, and Excel. Python is optional and only used as a light helper for CSV preparation or exports.
+**Supply Chain Profit-at-Risk & Fulfillment Recovery Analytics** is an analyst-friendly portfolio project built around SQL, BigQuery, Power BI, and Excel. Python is optional and only used as a light helper for CSV preparation or exports.
 
 The main business question is:
 
-> Which orders and lanes should operations prioritize to reduce SLA failures and protect profit?
+> Where is fulfillment performance exposing the most revenue and profit, and which recovery actions should be prioritized first?
 
 ## Final BigQuery Tables for Power BI
 
@@ -24,13 +24,13 @@ Use these tables from `supply_chain_analytics` in Power BI:
 | `mart_customer_segments` | Do Consumer / Corporate / Home Office differ in risk? | Segment comparison |
 | `mart_opportunity_scenarios` | What quantified, modeled actions could reduce exposure? | Scenario cards (never summed across rows — see DAX doc) |
 
-> All tables above are built from `int_orders` (see `sql/bigquery/01c_build_int_orders.sql`), the single order-grain table that fixes the historical `MAX` vs `SUM` profit bug. As of 2026-07-01 every mart SQL script exposes exactly one canonical field name per metric (the legacy backward-compatibility aliases have been removed). **Before refreshing**, rerun the full `sql/bigquery/` sequence in BigQuery, then refresh both the `.pbix` and the Excel workbook and re-bind any visual, slicer, or formula still pointing at an old field name (see the field list below).
+> All tables above are built from `int_orders` (see `sql/bigquery/01c_build_int_orders.sql`), the single order-grain table that fixes the historical `MAX` vs `SUM` profit bug. As of 2026-07-01 every mart SQL script exposes exactly one canonical field name per metric. **Before refreshing**, rerun the full `sql/bigquery/` sequence in BigQuery, run `python scripts/validate_exports.py` against the refreshed CSV exports, then refresh the `.pbix` and Excel artifacts. If a visual still references a retired field, use the canonical field list below to repair only that affected visual.
 
 ## Analytical Story
 
-1. **Value-Blind Fulfillment:** high-profit order lines receive no meaningful SLA advantage.
-2. **Service-Promise Mismatch:** Second Class is the primary operational concern; First Class's fixed one-day delay is disclosed as a structural dataset artifact.
-3. **Lane Reliability and Concentration:** market-mode lanes are prioritized using profit exposure, breach rate, and delivery variability.
+1. **Value-Blind Fulfillment:** high-profit orders receive no meaningful service advantage, leaving a concentrated commercial recovery pool.
+2. **Profit-Recovery Lever:** Second Class carries the clearest service-promise gap and $1.01M of profit exposure; First Class's fixed one-day delay is disclosed as a structural dataset artifact.
+3. **Commercial Concentration:** market-mode lanes are prioritized using profit exposure, breach rate, and delivery variability.
 
 ## Operations Priority Matrix
 
